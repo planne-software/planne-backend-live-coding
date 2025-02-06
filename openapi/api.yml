@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: Planne Backend Live Coding
+  version: 0.1.0
+paths:
+  /products:
+    get:
+      operationId: getProducts
+      tags:
+        - products
+      responses:
+        '200':
+          description: A JSON array containing the product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+  /orders:
+    post:
+      operationId: createOrder
+      tags:
+        - orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderParams'
+      responses:
+        '201':
+          description: A JSON object containing the order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /orders/{orderId}:
+    parameters:
+      - $ref: '#/components/parameters/OrderIdParam'
+    get:
+      operationId: getOrder
+      tags:
+        - orders
+      responses:
+        '200':
+          description: A JSON object containing the order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+components:
+  parameters:
+    OrderIdParam:
+      name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    NotFoundResponse:
+      description: A JSON object containing the error information
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorObject'
+  schemas:
+    ErrorObject:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - NOT_FOUND
+      required:
+        - status
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        priceCents:
+          type: integer
+      required:
+        - id
+        - name
+        - priceCents
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        amountCents:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+      required:
+        - id
+        - status
+        - amountCents
+        - items
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        productId:
+          type: integer
+        quantity:
+          type: integer
+      required:
+        - id
+        - productId
+        - quantity
+    CreateOrderParams:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateOrderItemParams'
+      required:
+        - items
+    CreateOrderItemParams:
+      type: object
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+      required:
+        - productId
+        - quantity
